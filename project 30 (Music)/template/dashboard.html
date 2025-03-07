@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+</head>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, rgb(32, 209, 32), rgb(255, 157, 0));
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+#main-header {
+    background-color: #c7168c;
+    color: #fff;
+    padding-top: 30px;
+    min-height: 70px;
+    border-bottom: #77d42a 3px solid;
+}
+
+#main-header h1 {
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0;
+    font-size: 24px;
+}
+
+#admin-nav, #user-nav {
+    background: #4b19bd;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+#admin-nav a, #user-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: inline-block;
+}
+
+#admin-nav a:hover, #user-nav a:hover {
+    background: #77d42a;
+    transition: 0.3s;
+    box-shadow: 0px 4px 2px -2px gray;
+}
+
+.button {
+    display: inline-block;
+    color: #333;
+    background: #77d42a;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: 0.3s;
+    cursor:pointer;
+}
+
+.button:hover {
+    background: #555;
+    color: #fff;
+    box-shadow: 0px 4px 2px -2px gray;
+}
+
+.section {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0px 4px 2px -2px gray;
+}
+
+.section h2 {
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-group button {
+    padding: 10px 20px;
+    background: #77d42a;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.form-group button:hover {
+    background: #555;
+}
+
+.music-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.music-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    width: calc(33.333% - 20px);
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0px 4px 2px -2px gray;
+}
+
+.music-item img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.music-item p {
+    margin: 10px 0;
+}
+
+.music-item audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+</style>
+<body>
+    {% if user.is_authenticated %}
+        {% if user.is_staff %}
+        <header id="main-header">
+            <div class="container">
+                <h1>Admin Dashboard</h1>
+            </div>
+        </header>
+    
+        <nav id="admin-nav">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'logout' %}">Log Out</a>
+        </nav>
+    
+        <div class="container">
+            <!-- Manage Users Section -->
+            <div id="manage-users" class="section">
+                <h2>Manage Users</h2>
+                {% if users %}
+                {% for user in users %}
+                <p>{{ user.username }}</p>
+                {% endfor %}
+                {% else %}
+                <p>No users found.</p>
+                {% endif %}
+            </div>
+    
+            <!-- Manage Music Section -->
+            <div id="manage-music" class="section">
+                <h2>Manage Music</h2>
+                <form action="{% url 'addmusic' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="music-title">Music Title</label>
+                        <input type="text" id="music-title" name="music_title">
+                    </div>
+                    <div class="form-group">
+                        <label for="music-artist">Artist</label>
+                        <input type="text" id="music-artist" name="music_artist">
+                    </div>
+                    <div class="form-group">
+                        <label for="music-genre">Genre</label>
+                        <input type="text" id="music-genre" name="music_genre">
+                    </div>
+                    <div class="form-group">
+                        <label for="music-file">Upload Music File</label>
+                        <input type="file" id="music-file" name="file">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Add Music</button>
+                    </div>
+                </form>
+            </div>
+        </div>  
+        {% else %}
+        <header id="main-header">
+            <div class="container">
+                <h1>User Dashboard</h1>
+            </div>
+        </header>
+    
+        <nav id="user-nav">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'logout' %}">Log Out</a>
+        </nav> 
+    
+        <div class="container">
+            <div id="discover-music" class="section">
+                <h2>Discover Music</h2>
+                <form action="{% url 'search' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="search" placeholder="Search for music..." id="search" name="search">
+                        <button type="submit" id="search-btn">Search</button>
+                    </div>
+                </form>
+                <div class="music-list">
+                    {% if musics %}
+                    {% for music in musics %}
+                    <div class="music-item">
+                        <img src="{{ music.image.url }}" alt="image">
+                        <p>{{ music.title }} | {{ music.artist }}</p>
+                        <audio controls>
+                            <source src="{{ music.file.url }}" type="audio/mpeg">
+                        </audio>
+                        <a href="{% url 'addtoplaylist' pk=music.id %}"><button class="button">Add to Playlist</button></a>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>No songs found.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div id="my-playlist" class="section">
+                <h2>My Playlist</h2>
+                <div class="music-list">
+                    {% if Mymusics %}
+                    {% for music in Mymusics %}
+                    <div class="music-item">
+                        <p>{{ music.fav.title }} | {{ music.fav.artist }}</p>
+                        <img src="{{ music.fav.image.url }}" alt="image">
+                        <audio controls>
+                            <source src="{{ music.fav.file.url }}" type="audio/mpeg">
+                        </audio>
+                        <a href="{% url 'removefromplaylist' pk=music.id %}"><button class="button">Remove</button></a>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>No songs found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+    <p>Please log in to view your dashboard.</p>
+    {% endif %}
+</body>
+</html>

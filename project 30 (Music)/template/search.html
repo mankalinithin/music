@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+</head>
+<style>
+    
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, rgb(32, 209, 32), rgb(255, 157, 0));
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+
+.section {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0px 4px 2px -2px gray;
+    border-radius: 8px;
+}
+
+.section h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.music-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.music-item {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    width: calc(33.333% - 20px);
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0px 4px 2px -2px gray;
+}
+
+.music-item img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.music-item p {
+    margin: 10px 0;
+    color: #555;
+}
+
+.music-item audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.music-item .button {
+    display: inline-block;
+    color: #fff;
+    background: #77d42a;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: 0.3s;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.music-item .button:hover {
+    background: #555;
+    color: #fff;
+    box-shadow: 0px 4px 2px -2px gray;
+}
+
+</style>
+<body>
+    <a href="{% url 'userdashboard' %}">Back</a>
+    <div class="container">
+        <div class="section">
+            {% if search %}
+            <h3>Search Results</h3>
+            <div class="music-list">
+                {% for music in search %}
+                <div class="music-item">
+                    <img src="{{ music.image.url }}" alt="image">
+                    <p>{{ music.title }} | {{ music.artist }}</p>
+                    <audio controls>
+                        <source src="{{ music.file.url }}" type="audio/mpeg">
+                    </audio>
+                    <a href="{% url 'addtoplaylist' pk=music.id %}">
+                        <button class="button">Add to Playlist</button>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No Music Found</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
